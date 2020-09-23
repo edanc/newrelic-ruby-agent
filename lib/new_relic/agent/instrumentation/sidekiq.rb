@@ -64,7 +64,7 @@ DependencyDetection.defer do
       class Client
         def call(_worker_class, job, *_)
           ::NewRelic::Agent.logger.info "Client class:#{_worker_class}, job: #{job}"
-          ::NewRelic::Agent.logger.info "Client NewRelic::NEWRELIC_KEY: #{NewRelic:NEWRELIC_KEY}"
+          ::NewRelic::Agent.logger.info "Client NewRelic::NEWRELIC_KEY: #{NewRelic::NEWRELIC_KEY}"
           ::NewRelic::Agent.logger.info "Client NEWRELIC_KEY before anything #{job[NewRelic::NEWRELIC_KEY]}"
           job[NewRelic::NEWRELIC_KEY] = distributed_tracing_headers if ::NewRelic::Agent.config[:'distributed_tracing.enabled']
           ::NewRelic::Agent.logger.info "Client NEWRELIC_KEY after #{job[NewRelic::NEWRELIC_KEY]}"
