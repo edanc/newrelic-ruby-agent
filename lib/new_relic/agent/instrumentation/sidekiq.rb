@@ -25,11 +25,21 @@ DependencyDetection.defer do
           else
             self.class.default_trace_args(msg)
           end
-          trace_headers = msg.delete(NewRelic::NEWRELIC_KEY)
+
+          trace_headers = if worker.class.name == 'Sidekiq::Batch::Callback'
+            ::NewRelic::Agent.logger.info 'getting trace_headers from callback class'
+            msg.delete(NewRelic::NEWRELIC_KEY)
+          else
+            msg.delete(NewRelic::NEWRELIC_KEY)
+          end
+
+          if trace_headers.nil?
+            ::NewRelic::Agent.logger.info "no trace_headers found in msg #{msg}"
+          end
 
           perform_action_with_newrelic_trace(trace_args) do
             NewRelic::Agent::Transaction.merge_untrusted_agent_attributes(msg['args'], :'job.sidekiq.args',
-              NewRelic::Agent::AttributeFilter::DST_NONE)
+                                                                          NewRelic::Agent::AttributeFilter::DST_NONE)
 
             ::NewRelic::Agent::DistributedTracing::accept_distributed_trace_headers(trace_headers, "Other") if ::NewRelic::Agent.config[:'distributed_tracing.enabled']
             yield
