@@ -28,6 +28,7 @@ DependencyDetection.defer do
 
           trace_headers = if worker.class.name == 'Sidekiq::Batch::Callback'
             ::NewRelic::Agent.logger.info 'getting trace_headers from callback class'
+            ::NewRelic::Agent.logger.info "msg: #{msg}"
             msg.delete(NewRelic::NEWRELIC_KEY)
           else
             msg.delete(NewRelic::NEWRELIC_KEY)
